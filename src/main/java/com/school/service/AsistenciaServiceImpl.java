@@ -26,21 +26,24 @@ public class AsistenciaServiceImpl implements AsistenciaService{
     @Autowired
     private AsistenciaDao asistenciaDao;
 
+    @Autowired
+    private ClaseService claseService;
+
+
+
     @Override
-    public byte[] generarReporte(String tipo, String fecha) {
+    public byte[] generarReporteAsistencia(String tipo, String fecha) {
         byte[] data = null;
 
         AsistenciaReporte asistenciaDTO = obtenerDatosAsistenciaPorDia(fecha);
 
         if(asistenciaDTO == null) return data;
 
+        List<AsistenciaReporte> lista = new ArrayList<>();
+        lista.add(asistenciaDTO);
+
         try {
             File file = new File(getClass().getClassLoader().getResource("asistencias.jasper").getFile());
-            List<AsistenciaReporte> lista = new ArrayList<>();
-
-
-
-            lista.add(asistenciaDTO);
 
             JasperPrint rpt = JasperFillManager.fillReport(file.getPath(), null, new JRBeanCollectionDataSource(lista));
 
@@ -73,13 +76,16 @@ public class AsistenciaServiceImpl implements AsistenciaService{
     }
 
     @Override
+    public List<Asistencia> findAsistenciaByFechaAula(String fecha, String idAula) {
+        return asistenciaDao.findAsistenciaByFechaAula(fecha, idAula);
+    }
+
+    @Override
     public AsistenciaReporte obtenerDatosAsistenciaPorDia(String fecha){
 
         List<Asistencia> asistencias = findByFecha(fecha);
 
-        if(asistencias.size() == 0){
-            return null;
-        }
+        if(asistencias.size() == 0) return null;
 
         Long puntual = 0L;
         Long tardanza = 0L;

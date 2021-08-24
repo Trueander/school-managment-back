@@ -1,22 +1,31 @@
 package com.school.reportDto;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class CursoReporte implements Serializable {
 
+    private String nombreAula;
     private String nombreCurso;
-    private long aprobados;
-    private long desaprobados;
+    private Long aprobados;
+    private Long desaprobados;
 
 
     public CursoReporte() {
     }
 
-    public CursoReporte(String nombreCuso, long aprobados, long desaprobados) {
+    public CursoReporte(String nombreAula, String nombreCuso, Long aprobados, Long desaprobados) {
+        this.nombreAula = nombreAula;
         this.nombreCurso = nombreCuso;
         this.aprobados = aprobados;
         this.desaprobados = desaprobados;
+    }
+
+    public String getNombreAula() {
+        return nombreAula;
+    }
+
+    public void setNombreAula(String nombreAula) {
+        this.nombreAula = nombreAula;
     }
 
     public String getNombreCurso() {
@@ -27,19 +36,19 @@ public class CursoReporte implements Serializable {
         this.nombreCurso = nombreCurso;
     }
 
-    public long getAprobados() {
+    public Long getAprobados() {
         return aprobados;
     }
 
-    public void setAprobados(long aprobados) {
+    public void setAprobados(Long aprobados) {
         this.aprobados = aprobados;
     }
 
-    public long getDesaprobados() {
+    public Long getDesaprobados() {
         return desaprobados;
     }
 
-    public void setDesaprobados(long desaprobados) {
+    public void setDesaprobados(Long desaprobados) {
         this.desaprobados = desaprobados;
     }
 

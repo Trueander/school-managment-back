@@ -1,5 +1,7 @@
 package com.school.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -8,7 +10,17 @@ import com.school.dao.MaterialDao;
 import com.school.dao.NotaDao;
 import com.school.model.Aula;
 import com.school.model.Nota;
+import com.school.reportDto.AsistenciaReporte;
 import com.school.reportDto.CursoReporte;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
+import net.sf.jasperreports.export.Exporter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,12 +49,18 @@ public class ClaseServiceImpl implements ClaseService{
 		clase.getFrecuencias().stream().forEach(f -> f.setClase(clase));
 		return claseDao.save(clase);
 	}
-	
+
+	@Override
+	public Clase saveNoFrecuenciaUpdate(Clase clase) {
+		return claseDao.save(clase);
+	}
+
 
 	@Override
 	@Transactional
 	public Clase update(Clase clase) {
 		// TODO Auto-generated method stub
+		clase.getFrecuencias().stream().forEach(f -> f.setClase(clase));
 		return claseDao.save(clase);
 	}
 
@@ -70,6 +88,42 @@ public class ClaseServiceImpl implements ClaseService{
 		}).orElse(false);
 	}
 
+	@Override
+	public byte[] generarReporteCurso(String tipo, Long idCurso, Long idGrado) {
+		byte[] data = null;
+
+		List<CursoReporte> listacursoReporte = getCursoReporte(idCurso,idGrado);
+
+		if(listacursoReporte == null) return data;
+
+		try {
+			File file = new File(getClass().getClassLoader().getResource("cursoReporte.jasper").getFile());
+
+			JasperPrint rpt = JasperFillManager.fillReport(file.getPath(), null, new JRBeanCollectionDataSource(listacursoReporte));
+
+			if(tipo.equals("pdf")){
+				data = JasperExportManager.exportReportToPdf(rpt);
+			}else{
+				SimpleXlsxReportConfiguration config = new SimpleXlsxReportConfiguration();
+				config.setOnePagePerSheet(true);
+				config.setIgnoreGraphics(false);
+
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+				Exporter exporter =  new JRXlsxExporter();
+				exporter.setExporterInput(new SimpleExporterInput(rpt));
+				exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(out));
+				exporter.exportReport();
+
+				data = out.toByteArray();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return data;
+	}
+
 
 	@Override
 	public List<CursoReporte> getCursoReporte(Long idCurso, Long idGrado) {
@@ -81,38 +135,19 @@ public class ClaseServiceImpl implements ClaseService{
 		if(idGrado == 0){
 			aulasGeneral = (List<Aula>) aulaDao.findAll();
 
-			cursoReporteList = iterarAulas(aulasGeneral, idCurso);
+			cursoReporteList = buscarAprobadosYDesaprobados(aulasGeneral, idCurso);
 
 			return cursoReporteList;
 
-//			System.out.println(aulasGeneral.size());
-//			for(Aula aula: aulasGeneral){
-//				long aprobados = 0;
-//				long desaprobados = 0;
-//				Clase clase = claseDao.findClasePorAulaYCurso(idCurso ,aula.getId());
-//				if(clase != null){
-//					List<Nota> notas = notaDao.notasPorAulaYCurso(idCurso, aula.getId());
-//
-//					if(notas.size() == 0){
-//						return cursoReporteList;
-//					}
-//					aprobados = notas.stream().filter(n -> n.getNota_bim1() > 12).count();
-//					desaprobados = notas.size() - aprobados;
-//					CursoReporte cursoReporte = new CursoReporte(notas.get(0).getEstudiante().getAulaEstudiante().getNombre() + notas.get(0).getEstudiante().getAulaEstudiante().getSeccion(), aprobados, desaprobados);
-//					cursoReporteList.add(cursoReporte);
-//
-//
-//				}
-//			}
 		}
 		aulasPorGrado = aulaDao.findAulaPorGrado(idGrado);
-		cursoReporteList = iterarAulas(aulasPorGrado, idCurso);
+		cursoReporteList = buscarAprobadosYDesaprobados(aulasPorGrado, idCurso);
 
 
 		return cursoReporteList;
 	}
 
-	private List<CursoReporte> iterarAulas(List<Aula> aulas, Long idCurso){
+	private List<CursoReporte> buscarAprobadosYDesaprobados(List<Aula> aulas, Long idCurso){
 		List<CursoReporte> cursoReporteList = new ArrayList<>();
 
 		for(Aula aula: aulas){
@@ -127,9 +162,8 @@ public class ClaseServiceImpl implements ClaseService{
 				}
 				aprobados = notas.stream().filter(n -> n.getNota_bim1() > 12).count();
 				desaprobados = notas.size() - aprobados;
-				CursoReporte cursoReporte = new CursoReporte(notas.get(0).getEstudiante().getAulaEstudiante().getNombre() + notas.get(0).getEstudiante().getAulaEstudiante().getSeccion(), aprobados, desaprobados);
+				CursoReporte cursoReporte = new CursoReporte(notas.get(0).getEstudiante().getAulaEstudiante().getNombre() + notas.get(0).getEstudiante().getAulaEstudiante().getSeccion(),notas.get(0).getCurso().getNombre() , aprobados, desaprobados);
 				cursoReporteList.add(cursoReporte);
-
 
 			}
 		}

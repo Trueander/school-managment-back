@@ -14,6 +14,7 @@ import javax.validation.Valid;
 import com.school.dao.MaterialDao;
 import com.school.model.Material;
 import com.school.model.Nota;
+import com.school.service.FrecuenciaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -38,6 +39,9 @@ public class ClaseController {
 
 	@Autowired
 	private MaterialDao materialDao;
+
+	@Autowired
+	private FrecuenciaService frecuenciaService;
 	
 	@GetMapping
 	public ResponseEntity<List<Clase>> getAllClases(){
@@ -133,12 +137,19 @@ public class ClaseController {
 		}
 		
 		try {
+			//seteamos las clases a null para luego guardarla y obtener luego solo las nuevas frecuencias
+			claseActual.getFrecuencias().forEach(f -> f.setClase(null));
+			claseActual = claseService.saveNoFrecuenciaUpdate(claseActual);
+
 			claseActual.setAula(clase.getAula());
 			claseActual.setEmpleado(clase.getEmpleado());
 			claseActual.setCurso(clase.getCurso());
 			claseActual.setFrecuencias(clase.getFrecuencias());
 			claseActual.setMateriales(clase.getMateriales());
 			claseActualizada = claseService.update(claseActual);
+
+			//eliminamos las clases que tienen la clase en NULL
+			frecuenciaService.deleFrecuenciasNulas();
 		} catch (DataAccessException e) {
 			response.put("mensaje", "Error al insertar la clase en la base de datos");
 			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));

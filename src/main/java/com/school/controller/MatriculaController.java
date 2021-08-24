@@ -122,16 +122,24 @@ public class MatriculaController {
 	public ResponseEntity<?> getReporteAsistenciaPDF(@RequestParam("fecha") String fecha){
 		return ResponseEntity.ok()
 				.contentType(MediaType.APPLICATION_OCTET_STREAM)
-				.header("Content-Disposition","attachment; filename="+"rpt.pdf")
-				.body(asistenciaService.generarReporte("pdf", fecha));
+				.header("Content-Disposition","attachment; filename="+"asistencias.pdf")
+				.body(asistenciaService.generarReporteAsistencia("pdf", fecha));
 	}
 
 	@GetMapping("/getXLS")
 	public ResponseEntity<?> getReporteAsistenciaXLS(@RequestParam("fecha") String fecha){
 		return ResponseEntity.ok()
 				.contentType(MediaType.APPLICATION_OCTET_STREAM)
-				.header("Content-Disposition","attachment; filename="+"rpt.xlsx")
-				.body(asistenciaService.generarReporte("xls", fecha));
+				.header("Content-Disposition","attachment; filename="+"asistencias.xlsx")
+				.body(asistenciaService.generarReporteAsistencia("xls", fecha));
+	}
+
+	@GetMapping("/getReporteCursoXLS")
+	public ResponseEntity<?> getReporteCursoXLS(@RequestParam("idCurso") String idCurso, @RequestParam("idGrado")  String idGrado){
+		return ResponseEntity.ok()
+				.contentType(MediaType.APPLICATION_OCTET_STREAM)
+				.header("Content-Disposition","attachment; filename="+"cursos.xlsx")
+				.body(claseService.generarReporteCurso("xls", Long.parseLong(idCurso), Long.parseLong(idGrado)));
 	}
 
 	@GetMapping("/getAsistenciasPorDia")
@@ -139,10 +147,14 @@ public class MatriculaController {
 		return new ResponseEntity<>(asistenciaService.obtenerDatosAsistenciaPorDia(fecha), HttpStatus.OK);
 	}
 
+	@GetMapping("/getAsistenciasFechaAula")
+	public ResponseEntity<?>  obtenerAsistenciasPorDia(@RequestParam("fecha") String fecha, @RequestParam("idAula") String idAula){
+		return new ResponseEntity<>(asistenciaService.findAsistenciaByFechaAula(fecha, idAula), HttpStatus.OK);
+	}
+
 	@GetMapping("/getCursoReporte")
 	public ResponseEntity<List<CursoReporte>> getCursoReporte(@RequestParam("idCurso") String idCurso, @RequestParam("idGrado")  String idGrado){
 		List<CursoReporte> cursoReporteList = claseService.getCursoReporte(Long.parseLong(idCurso),Long.parseLong(idGrado));
-		cursoReporteList.forEach(c -> System.out.println(c.getNombreCurso()));
 
 		return new ResponseEntity<>(cursoReporteList, HttpStatus.OK);
 	}
