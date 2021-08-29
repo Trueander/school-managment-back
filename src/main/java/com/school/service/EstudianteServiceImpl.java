@@ -28,6 +28,12 @@ public class EstudianteServiceImpl implements EstudianteService{
 	@Override
 	@Transactional(readOnly = false)
 	public List<Estudiante> saveAll(List<Estudiante> estudiantes) {
+
+		estudiantes.stream()
+				.forEach(e -> e.getAsistencias()
+						.stream()
+						.forEach(a-> { if(a.getEstudiante() == null) a.setEstudiante(e); }));
+
 		return estudianteDao.saveAll(estudiantes);
 	}
 

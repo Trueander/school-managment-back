@@ -1,5 +1,7 @@
 package com.school.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -14,6 +16,11 @@ public class Asistencia implements Serializable {
     private String fecha;
 
     private String estado;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "estudiante_id")
+    @JsonIgnoreProperties({"asistencias","hibernateLazyInitializer", "handler"})
+    private Estudiante estudiante;
 
     public Asistencia() {
     }
@@ -40,6 +47,14 @@ public class Asistencia implements Serializable {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public Estudiante getEstudiante() {
+        return estudiante;
+    }
+
+    public void setEstudiante(Estudiante estudiante) {
+        this.estudiante = estudiante;
     }
 
     private static final long serialVersionUID = 1L;

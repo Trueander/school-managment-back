@@ -210,6 +210,58 @@ public class EstudianteController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
+	@PutMapping("/actualizarSinAsistencia/{id}")
+	public ResponseEntity<?> updateEstudianteAula(@Valid @RequestBody Estudiante estudiante ,BindingResult results , @PathVariable Long id){
+		Estudiante estudianteActual = estudianteService.getEstudianteById(id).get();
+		Estudiante estudianteActualizado = null;
+		Map<String, Object> response = new HashMap<>();
+
+		if(results.hasErrors()) {
+			List<String> errors = results.getFieldErrors()
+					.stream()
+					.map(er -> "El campo '" + er.getField() +"' " + er.getDefaultMessage())
+					.collect(Collectors.toList());
+
+			response.put("errors", errors);
+
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+		}
+
+		if(estudianteActual == null) {
+			response.put("mensaje", "Error: No se pudo editar, el estudiante con el ID: ".concat(id.toString().concat(" no existe en la base de datos")));
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
+		}
+
+		try {
+			estudianteActual.setNombres(estudiante.getNombres());
+			estudianteActual.setApellidoPaterno(estudiante.getApellidoPaterno());
+			estudianteActual.setApellidoMaterno(estudiante.getApellidoMaterno());
+			estudianteActual.setDni(estudiante.getDni());
+			estudianteActual.setFechaNacimiento(estudiante.getFechaNacimiento());
+			estudianteActual.setCorreo(estudiante.getCorreo());
+			estudianteActual.setSexo(estudiante.getSexo());
+			estudianteActual.setAulaEstudiante(estudiante.getAulaEstudiante());
+			estudianteActual.setDomicilio(estudiante.getDomicilio());
+			estudianteActual.setApoderado(estudiante.getApoderado());
+			estudianteActual.setGrado(estudiante.getGrado());
+			estudianteActual.setNivel(estudiante.getNivel());
+			estudianteActual.setTurno(estudiante.getTurno());
+			estudianteActual.setNotas(estudiante.getNotas());
+
+			estudianteActualizado = estudianteService.save(estudianteActual);
+		} catch (DataAccessException e) {
+			response.put("mensaje", "Error al actualizar el estudiante en la base de datos");
+			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		response.put("mensaje", "El estudiante ha sido actualizado con éxito!");
+		response.put("estudiante", estudianteActualizado);
+
+		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
+	}
+
 //	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteEstudiante(@PathVariable Long id){

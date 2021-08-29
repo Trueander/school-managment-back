@@ -89,8 +89,8 @@ public class Estudiante implements Serializable {
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private Nivel nivel;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "estudiante_id")
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "estudiante")
+	@JsonIgnoreProperties({"estudiante","hibernateLazyInitializer", "handler"})
 	private List<Asistencia> asistencias = new ArrayList<>();
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "estudiante")

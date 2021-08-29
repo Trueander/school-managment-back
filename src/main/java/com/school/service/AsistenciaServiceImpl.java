@@ -76,7 +76,7 @@ public class AsistenciaServiceImpl implements AsistenciaService{
     }
 
     @Override
-    public List<Asistencia> findAsistenciaByFechaAula(String fecha, String idAula) {
+    public List<Asistencia> findAsistenciaByFechaAula(String fecha, Long idAula) {
         return asistenciaDao.findAsistenciaByFechaAula(fecha, idAula);
     }
 
@@ -100,6 +100,11 @@ public class AsistenciaServiceImpl implements AsistenciaService{
         AsistenciaReporte asistenciaDTO = new AsistenciaReporte(fecha,puntual,tardanza,inasistencia);
 
         return asistenciaDTO;
+    }
+
+    @Override
+    public List<Asistencia> updateAsistencias(List<Asistencia> asistencias) {
+        return asistenciaDao.saveAll(asistencias);
     }
 
 

@@ -149,7 +149,7 @@ public class MatriculaController {
 
 	@GetMapping("/getAsistenciasFechaAula")
 	public ResponseEntity<?>  obtenerAsistenciasPorDia(@RequestParam("fecha") String fecha, @RequestParam("idAula") String idAula){
-		return new ResponseEntity<>(asistenciaService.findAsistenciaByFechaAula(fecha, idAula), HttpStatus.OK);
+		return new ResponseEntity<>(asistenciaService.findAsistenciaByFechaAula(fecha, Long.parseLong(idAula)), HttpStatus.OK);
 	}
 
 	@GetMapping("/getCursoReporte")
@@ -157,6 +157,27 @@ public class MatriculaController {
 		List<CursoReporte> cursoReporteList = claseService.getCursoReporte(Long.parseLong(idCurso),Long.parseLong(idGrado));
 
 		return new ResponseEntity<>(cursoReporteList, HttpStatus.OK);
+	}
+
+	@PutMapping("/updateAsistencias")
+	public ResponseEntity<?> updateAsistencias(@RequestBody List<Asistencia> asistencias){
+		List<Asistencia> asistenciasActualizar = asistencias;
+		Map<String, Object> response = new HashMap<>();
+
+
+		try {
+			asistenciasActualizar = asistenciaService.updateAsistencias(asistencias);
+		} catch (DataAccessException e) {
+			response.put("mensaje", "Error al actualizar las asistencias en la base de datos");
+			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		response.put("mensaje", "Las asistencias se actualizaron con éxito!");
+		response.put("asistencias", asistenciasActualizar);
+
+		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
 }
