@@ -6,4 +6,5 @@ import com.school.model.Apoderado;
 
 public interface ApoderadoDao extends JpaRepository<Apoderado, Long>{
 
+    public Apoderado findByDni(String dni);
 }

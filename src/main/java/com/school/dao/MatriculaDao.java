@@ -20,4 +20,7 @@ public interface MatriculaDao extends JpaRepository<Matricula, Long>{
 
     @Query("FROM DiaSemana")
     public List<DiaSemana> getDias();
+
+    @Query("FROM Matricula m where m.estudiante.id = ?1")
+    public List<Matricula> getMatriculasPorEstudiante(Long id);
 }

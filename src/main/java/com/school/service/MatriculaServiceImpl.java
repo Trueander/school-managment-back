@@ -61,5 +61,10 @@ public class MatriculaServiceImpl implements MatriculaService{
 		return matriculaDao.getDias();
 	}
 
+	@Override
+	public List<Matricula> getMatriculasPorEstudiante(Long id) {
+		return matriculaDao.getMatriculasPorEstudiante(id);
+	}
+
 
 }

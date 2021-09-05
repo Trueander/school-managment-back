@@ -14,4 +14,6 @@ public interface ApoderadoService {
 	public List<Apoderado> findAll();
 	
 	public boolean delete(Long id);
+
+	public Apoderado findByDni(String dni);
 }

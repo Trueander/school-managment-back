@@ -48,4 +48,9 @@ public class ApoderadoServiceImpl implements ApoderadoService{
 		}).orElse(false);
 	}
 
+	@Override
+	public Apoderado findByDni(String dni) {
+		return apoderadoService.findByDni(dni);
+	}
+
 }

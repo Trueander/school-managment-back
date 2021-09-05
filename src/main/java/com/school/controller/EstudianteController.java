@@ -149,7 +149,6 @@ public class EstudianteController {
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
 		}
 
-		System.out.println(estudiante.getNombres());
 		return new ResponseEntity<Estudiante>(estudiante, HttpStatus.OK);
 
 	}

@@ -23,4 +23,6 @@ public interface MatriculaService {
 	public List<Turno> getTurnos();
 
 	public List<DiaSemana> getDias();
+
+	public List<Matricula> getMatriculasPorEstudiante(Long id);
 }

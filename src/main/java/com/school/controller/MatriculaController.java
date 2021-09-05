@@ -15,6 +15,7 @@ import com.school.service.AsistenciaService;
 import com.school.service.ClaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -178,6 +179,11 @@ public class MatriculaController {
 		response.put("asistencias", asistenciasActualizar);
 
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
+	}
+
+	@GetMapping("/matriculasPorEstudiante")
+	public ResponseEntity<List<Matricula>> getMatriculasPorEstudiante(@Param("id") String id) {
+		return new ResponseEntity<List<Matricula>>(matriculaService.getMatriculasPorEstudiante(Long.parseLong(id)), HttpStatus.OK);
 	}
 
 }
