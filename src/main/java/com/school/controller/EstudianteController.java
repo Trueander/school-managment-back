@@ -129,7 +129,7 @@ public class EstudianteController {
 
 //	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/buscarDni")
-	public ResponseEntity<?> getEstudianteByDni(@RequestParam String username, @RequestParam String password){
+	public ResponseEntity<?> getEstudiantePorUserAndPassword(@RequestParam String username, @RequestParam String password){
 
 		Estudiante estudiante = null;
 		Map<String, Object> response = new HashMap<>();
@@ -150,6 +150,32 @@ public class EstudianteController {
 		}
 
 		return new ResponseEntity<Estudiante>(estudiante, HttpStatus.OK);
+
+	}
+
+	@GetMapping("/porDni")
+	public ResponseEntity<?> getEstudiantePorDni(@RequestParam("dni") String dni){
+
+		Estudiante estudiante = null;
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+			estudiante = estudianteService.findByDni(dni);
+		} catch (DataAccessException e) {
+			response.put("mensaje", "Error al consultar el estudiante en la base de datos");
+			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		if(estudiante == null) {
+			response.put("mensaje", "El estudiante con el DNI: ".concat(dni.concat(" no existe en la base de datos")));
+
+		}
+
+		response.put("estudiante", estudiante);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
 
 	}
 

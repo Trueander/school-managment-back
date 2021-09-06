@@ -15,4 +15,6 @@ public interface EstudianteDao extends JpaRepository<Estudiante, Long>{
 
     public Estudiante findByDniAndDni(String username, String password);
 
+    public Estudiante findByDni(String dni);
+
 }

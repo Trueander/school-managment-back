@@ -29,4 +29,7 @@ public interface EstudianteService {
 
 	public Estudiante findByDniAndDni(String username, String password);
 
+	public Estudiante findByDni(String dni);
+
+
 }
