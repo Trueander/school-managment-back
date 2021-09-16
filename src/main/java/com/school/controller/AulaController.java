@@ -15,6 +15,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,21 +30,25 @@ public class AulaController {
 	@Autowired
 	private AulaService aulaService;
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping
 	public ResponseEntity<List<Aula>> getAllAulas(){
 		return new ResponseEntity<List<Aula>>(aulaService.findAll(), HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
 	@GetMapping("/estudiantes")
 	public ResponseEntity<List<Estudiante>> getAllEstudiantesAula(@RequestParam("id") String id){
 		return new ResponseEntity<List<Estudiante>>(aulaService.findEstudiantesAula(Long.parseLong(id)), HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/clases")
 	public ResponseEntity<List<Clase>> getAllClasesAula(@RequestParam("id") String id){
 		return new ResponseEntity<List<Clase>>(aulaService.findClasesAula(Long.parseLong(id)), HttpStatus.OK);
 	}
-	
+
+	@PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getAula(@PathVariable Long id){
 		
@@ -67,7 +72,8 @@ public class AulaController {
 		
 		return new ResponseEntity<Aula>(aula.get() ,HttpStatus.OK);
 	}
-	
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/crear")
 	public ResponseEntity<?> saveAula(@Valid @RequestBody Aula aula, BindingResult results){
 		
@@ -99,7 +105,8 @@ public class AulaController {
 		
 		return new ResponseEntity<Map<String, Object>>(response ,HttpStatus.CREATED);
 	}
-	
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{id}")
 	public ResponseEntity<?> updateAula(@Valid @RequestBody Aula aula, BindingResult results, @PathVariable Long id){
 		
@@ -145,7 +152,8 @@ public class AulaController {
 		
 		return new ResponseEntity<Map<String, Object>>(response ,HttpStatus.CREATED);
 	}
-	
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteAula(@PathVariable Long id){
 	

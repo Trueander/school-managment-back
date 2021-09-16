@@ -15,13 +15,16 @@ import com.school.dao.MaterialDao;
 import com.school.model.Material;
 import com.school.model.Nota;
 import com.school.service.FrecuenciaService;
+import com.school.service.UploadFileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,18 +45,23 @@ public class ClaseController {
 
 	@Autowired
 	private FrecuenciaService frecuenciaService;
-	
+
+	@Autowired
+	private UploadFileService uploadFileService;
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping
 	public ResponseEntity<List<Clase>> getAllClases(){
 		return new ResponseEntity<List<Clase>>(claseService.findAll(), HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
 	@PostMapping("/crearNota")
 	public ResponseEntity<Nota> crearNota(@RequestBody Nota nota){
 		return new ResponseEntity<Nota>(nota, HttpStatus.CREATED);
 	}
 
-
+	@PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getClase(@PathVariable Long id){
 		
@@ -77,8 +85,8 @@ public class ClaseController {
 		
 		return new ResponseEntity<Clase>(clase.get() ,HttpStatus.OK);
 	}
-	
-	
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/crear")
 	public ResponseEntity<?> saveClase(@Valid @RequestBody Clase clase, BindingResult result){
 		
@@ -110,9 +118,9 @@ public class ClaseController {
 		
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
-	
-	
 
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{id}")
 	public ResponseEntity<?> updateClase(@Valid @RequestBody Clase clase, BindingResult result, @PathVariable Long id){
 		
@@ -162,7 +170,8 @@ public class ClaseController {
 		
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
-	
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteClase(@PathVariable Long id){
 		
@@ -176,17 +185,7 @@ public class ClaseController {
 		}
 		
 		try {
-			clase.getMateriales().forEach( c -> {
-				String archivoPDFparaBorrar = c.getArchivo();
-
-				if(archivoPDFparaBorrar != null && archivoPDFparaBorrar.length() > 0){
-					Path rutaArchivoPDF = Paths.get("uploads").resolve(archivoPDFparaBorrar).toAbsolutePath();
-					File archivoPDFparaborrar = rutaArchivoPDF.toFile();
-					if(archivoPDFparaborrar.exists() && archivoPDFparaborrar.canRead()){
-						archivoPDFparaborrar.delete();
-					}
-				}
-			});
+			clase.getMateriales().forEach(c -> uploadFileService.deleteFile(c.getArchivo()));
 			claseService.delete(id);
 
 		} catch (DataAccessException e) {
@@ -200,7 +199,8 @@ public class ClaseController {
 		
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
-	
+
+	@PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
 	@PostMapping("/uploads")
 	public ResponseEntity<?> upload(@RequestParam("archivo") MultipartFile archivo, @RequestParam("idClase") String idAula, @RequestParam("nombreFile") String nombreFile){
 		Map<String, Object> response = new HashMap<>();
@@ -208,33 +208,34 @@ public class ClaseController {
 		Clase clase = claseService.getClaseById(Long.parseLong(idAula)).orElse(null);
 
 		if(!archivo.isEmpty()){
-			String nombreArchivoPDF = UUID.randomUUID().toString() + "_" + archivo.getOriginalFilename().replace(" ","");
-			Path rutaArchivo = Paths.get("uploads").resolve(nombreArchivoPDF).toAbsolutePath();
+			String nombreArchivo = null;
 
 			try {
-				Files.copy(archivo.getInputStream(), rutaArchivo);
+				nombreArchivo = uploadFileService.uploadFile(archivo);
+
+				Material material = new Material();
+				material.setNombre(nombreFile);
+				material.setArchivo(nombreArchivo);
+				clase.getMateriales().add(material);
+
+				claseService.update(clase);
 			} catch (IOException e) {
-				response.put("mensaje", "Error al subir el archivo "+nombreArchivoPDF);
+				response.put("mensaje", "Error al subir archivo.");
 				response.put("error", e.getMessage().concat(": ").concat(e.getCause().getMessage()));
+
 				return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 
-			Material material = new Material();
-			material.setNombre(nombreFile);
-			material.setArchivo(nombreArchivoPDF);
-			clase.getMateriales().add(material);
-
-			claseService.update(clase);
-
 			response.put("clase", clase);
-			response.put("mensaje", "Has subido correctamente el archivo " + nombreArchivoPDF);
+			response.put("mensaje", "Has subido correctamente el archivo " + nombreArchivo);
+
 
 		}
-
 
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
+	@PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
 	@DeleteMapping("/eliminarMaterial")
 	public ResponseEntity<?> deleteArchivo(@RequestParam("idClase") String idClase, @RequestParam("idMaterial") String idMaterial){
 
@@ -246,36 +247,30 @@ public class ClaseController {
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
 		}
 
-		Material materialEncontrado = clase.getMateriales().stream().filter(material -> Long.parseLong(idMaterial) == material.getId())
-							 .findAny()
-							 .orElse(null);
+		Material materialEncontrado = clase.getMateriales()
+				.stream()
+				.filter(material -> Long.parseLong(idMaterial) == material.getId())
+				.findFirst()
+				.orElse(null);
 
 		if(materialEncontrado == null){
 			response.put("mensaje", "El material con el id "+idMaterial+" no existe en la base de datos");
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
 		}
 
-		String archivoPDFparaBorrar = materialEncontrado.getArchivo();
+		String archivoParaBorrar = materialEncontrado.getArchivo();
 
-		if(archivoPDFparaBorrar == null || archivoPDFparaBorrar.length() == 0 || archivoPDFparaBorrar.length() < 0){
-			response.put("mensaje", "Hubo un error al eliminar el material "+archivoPDFparaBorrar);
-			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-
-		Path rutaArchivoPDF = Paths.get("uploads").resolve(archivoPDFparaBorrar).toAbsolutePath();
-		File archivoPDFparaborrar = rutaArchivoPDF.toFile();
-		if(!archivoPDFparaborrar.exists() || !archivoPDFparaborrar.canRead()){
-			response.put("mensaje", "Error al eliminar "+archivoPDFparaBorrar+", el archivo no existe o no se puede leer");
+		if(archivoParaBorrar == null || archivoParaBorrar.length() == 0 || archivoParaBorrar.length() < 0){
+			response.put("mensaje", "Hubo un error al eliminar el material "+archivoParaBorrar);
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		try{
 
 			clase.getMateriales().remove(materialEncontrado);
-
+			uploadFileService.deleteFile(archivoParaBorrar);
 			claseService.update(clase);
 			materialDao.deleteById(materialEncontrado.getId());
-			archivoPDFparaborrar.delete();
 		}catch (DataAccessException e){
 			response.put("mensaje", "Error al eliminar el archivo en la base de datos");
 			response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
@@ -289,39 +284,15 @@ public class ClaseController {
 
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 	}
-	
-	@GetMapping("/uploads/pdf/{nombrePDF:.+}")
-	public ResponseEntity<Resource> verArchivoPDF(@PathVariable String nombrePDF){
 
-		Path rutaArchivoPDF = Paths.get("uploads").resolve(nombrePDF).toAbsolutePath();
-		Resource recurso = null;
+	@GetMapping("/uploads/{nombre:.+}")
+	public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable String nombre) throws MalformedURLException {
 
-		try {
-			recurso = new UrlResource(rutaArchivoPDF.toUri());
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
+		byte[] data = uploadFileService.cargarImagen(nombre);
+		ByteArrayResource resource = new ByteArrayResource(data);
 
-		if(!recurso.exists() && !recurso.isReadable()){
-			throw new RuntimeException("Error no se pudo cargar el PDF "+nombrePDF);
-		}
-
-		HttpHeaders cabecera = new HttpHeaders();
-		cabecera.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + recurso.getFilename() + "\"");
-
-		return new ResponseEntity<Resource>(recurso, cabecera, HttpStatus.OK);
+		return ResponseEntity.ok().contentLength(data.length).header("Content.type", "application/octet-stream")
+				.header("Content-disposition", "attachment; filename=\"" + nombre + "\"").body(resource);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 }

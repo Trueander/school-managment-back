@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,16 +32,19 @@ public class EmpleadoController {
     @Autowired
     private EspecialidadService especialidadService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<Empleado>> getAllEmpleados(){
         return new ResponseEntity<>(empleadoService.findAll(), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
     @GetMapping("/clases")
     public ResponseEntity<List<Clase>> getClasesEmpleado(@RequestParam("id") String id){
         return new ResponseEntity<List<Clase>>(empleadoService.findClasesProfesor(Long.parseLong(id)), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/crear")
     public ResponseEntity<?> saveEmpleado(@Valid @RequestBody Empleado empleado, BindingResult results){
         Empleado empleadoNuevo = null;
@@ -73,6 +77,7 @@ public class EmpleadoController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getEmpleado(@PathVariable Long id){
 
@@ -98,6 +103,7 @@ public class EmpleadoController {
 
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
     @GetMapping("/buscarDni")
     public ResponseEntity<?> getEmpleadoByDni(@RequestParam String dni){
 
@@ -123,6 +129,7 @@ public class EmpleadoController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEmpleado(@Valid @RequestBody Empleado empleado ,BindingResult results , @PathVariable Long id){
         Empleado empleadoActual = empleadoService.getEmpleadoById(id).get();
@@ -171,6 +178,7 @@ public class EmpleadoController {
     }
 
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEmpleado(@PathVariable Long id){
 
@@ -199,11 +207,13 @@ public class EmpleadoController {
         return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/especialidades")
     public ResponseEntity<List<Especialidad>> listarEspecialidades(){
         return new ResponseEntity<List<Especialidad>>(especialidadService.findAll(), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/especialidades/crear")
     public ResponseEntity<?> crearEspecialidad(@RequestBody Especialidad especialidad, BindingResult results){
 

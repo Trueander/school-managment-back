@@ -31,14 +31,13 @@ public class EstudianteController {
 	@Autowired
 	private EstudianteService estudianteService;
 
-
-
-//	@PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
 	@GetMapping
 	public ResponseEntity<List<Estudiante>> getAllEstudiantes(){
 		return new ResponseEntity<>(estudianteService.findAll(), HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/page/{page}")
 	public ResponseEntity<Page<Estudiante>> getAllEstudiantesPage(@PathVariable Integer page){
 
@@ -47,6 +46,7 @@ public class EstudianteController {
 		return new ResponseEntity<>(estudianteService.findAll(pageable), HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/crear")
 	public ResponseEntity<?> saveEstudiante(@Valid @RequestBody Estudiante estudiante, BindingResult results){
 		Estudiante estudianteNuevo = null;
@@ -79,6 +79,7 @@ public class EstudianteController {
 		
 	}
 
+	@PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
 	@PutMapping("/actualizarEstudiantes")
 	public ResponseEntity<?> saveAllEstudiante(@RequestBody List<Estudiante> estudiantes){
 		List<Estudiante> estudiantesActualizar = estudiantes;
@@ -101,7 +102,7 @@ public class EstudianteController {
 
 	}
 
-//	@PreAuthorize("hasAnyRole('ADMIN','PROFESOR')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getEstudiante(@PathVariable Long id){
 		
@@ -153,6 +154,7 @@ public class EstudianteController {
 
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/porDni")
 	public ResponseEntity<?> getEstudiantePorDni(@RequestParam("dni") String dni){
 
@@ -180,7 +182,7 @@ public class EstudianteController {
 	}
 
 
-//	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{id}")
 	public ResponseEntity<?> updateEstudiante(@Valid @RequestBody Estudiante estudiante ,BindingResult results , @PathVariable Long id){
 		Estudiante estudianteActual = estudianteService.getEstudianteById(id).get();
@@ -235,6 +237,7 @@ public class EstudianteController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/actualizarSinAsistencia/{id}")
 	public ResponseEntity<?> updateEstudianteAula(@Valid @RequestBody Estudiante estudiante ,BindingResult results , @PathVariable Long id){
 		Estudiante estudianteActual = estudianteService.getEstudianteById(id).get();
@@ -287,7 +290,7 @@ public class EstudianteController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
-//	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteEstudiante(@PathVariable Long id){
 		

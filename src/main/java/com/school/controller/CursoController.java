@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,12 +35,14 @@ public class CursoController {
 
 	@Autowired
 	private CursoService cursoService;
-	
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping
 	public ResponseEntity<List<Curso>> getAllCursos(){
 		return new ResponseEntity<List<Curso>>(cursoService.findAll(), HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getCurso(@PathVariable Long id){
 
@@ -63,7 +66,8 @@ public class CursoController {
 
 		return new ResponseEntity<Curso>(curso.get() ,HttpStatus.OK);
 	}
-	
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/crear")
 	public ResponseEntity<?> saveCurso(@Valid @RequestBody Curso curso, BindingResult results){
 		
@@ -97,7 +101,8 @@ public class CursoController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 		
 	}
-	
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{id}")
 	public ResponseEntity<?> updateCurso(@Valid @RequestBody Curso curso ,BindingResult results , @PathVariable Long id){
 		Curso cursoActual = cursoService.getCursoById(id).get();
@@ -136,10 +141,10 @@ public class CursoController {
 		
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
-	
-	
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteEstudiante(@PathVariable Long id){
+	public ResponseEntity<?> deleteCurso(@PathVariable Long id){
 		
 		Map<String, Object> response = new HashMap<>();
 		Curso curso = cursoService.getCursoById(id).orElse(null);

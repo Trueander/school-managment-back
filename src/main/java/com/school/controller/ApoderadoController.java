@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -19,6 +20,7 @@ public class ApoderadoController {
     @Autowired
     private ApoderadoService apoderadoService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/findByDni")
     public ResponseEntity<?> getApoderado(@RequestParam("dni") String dni){
 

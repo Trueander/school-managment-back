@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,12 +34,14 @@ public class GradoController {
 
 	@Autowired
 	private GradoService gradoService;
-	
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping
 	public ResponseEntity<List<Grado>> getAllGrados(){
 		return new ResponseEntity<List<Grado>>(gradoService.findAll(), HttpStatus.OK);
 	}
-	
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getGrado(@PathVariable Long id){
 		
@@ -62,7 +65,8 @@ public class GradoController {
 		
 		return new ResponseEntity<Grado>(grado.get() ,HttpStatus.OK);
 	}
-	
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/crear")
 	public ResponseEntity<?> saveGrado(@Valid @RequestBody Grado grado, BindingResult results){
 		
@@ -94,7 +98,8 @@ public class GradoController {
 		
 		return new ResponseEntity<Map<String, Object>>(response ,HttpStatus.CREATED);
 	}
-	
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{id}")
 	public ResponseEntity<?> updateGrado(@Valid @RequestBody Grado grado, BindingResult results, @PathVariable Long id){
 		
@@ -136,7 +141,8 @@ public class GradoController {
 		
 		return new ResponseEntity<Map<String, Object>>(response ,HttpStatus.CREATED);
 	}
-	
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteGrado(@PathVariable Long id){
 	

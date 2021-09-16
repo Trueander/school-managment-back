@@ -19,6 +19,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,8 @@ public class MatriculaController {
 
 	@Autowired
 	private ClaseService claseService;
-	
+
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/crear")
 	public ResponseEntity<?> saveMatricula(@Valid @RequestBody Matricula matricula, BindingResult results){
 		
@@ -78,26 +80,31 @@ public class MatriculaController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/niveles")
 	public ResponseEntity<List<Nivel>> getNiveles(){
 		return new ResponseEntity<>(matriculaService.getNiveles(), HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/turnos")
 	public ResponseEntity<List<Turno>> getTurnos(){
 		return new ResponseEntity<>(matriculaService.getTurnos(), HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/dias")
 	public ResponseEntity<List<DiaSemana>> getDias(){
 		return new ResponseEntity<>(matriculaService.getDias(), HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
 	@GetMapping("/notas")
 	public ResponseEntity<List<Nota>> getNotas(@RequestParam("idCurso") String idCurso, @RequestParam("idAula") String idAula){
 		return new ResponseEntity<>(notaDao.notasPorAulaYCurso(Long.parseLong(idCurso), Long.parseLong(idAula)), HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
 	@PutMapping("/notas")
 	public ResponseEntity<?> UpdateNota(@RequestBody List<Nota> notas){
 		List<Nota> notasActualizar = notas;
@@ -119,6 +126,7 @@ public class MatriculaController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/getPDF")
 	public ResponseEntity<?> getReporteAsistenciaPDF(@RequestParam("fecha") String fecha){
 		return ResponseEntity.ok()
@@ -143,16 +151,19 @@ public class MatriculaController {
 				.body(claseService.generarReporteCurso("xls", Long.parseLong(idCurso), Long.parseLong(idGrado)));
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/getAsistenciasPorDia")
 	public ResponseEntity<AsistenciaReporte>  obtenerAsistenciasPorDia(@RequestParam("fecha") String fecha){
 		return new ResponseEntity<>(asistenciaService.obtenerDatosAsistenciaPorDia(fecha), HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/getAsistenciasFechaAula")
 	public ResponseEntity<?>  obtenerAsistenciasPorDia(@RequestParam("fecha") String fecha, @RequestParam("idAula") String idAula){
 		return new ResponseEntity<>(asistenciaService.findAsistenciaByFechaAula(fecha, Long.parseLong(idAula)), HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/getCursoReporte")
 	public ResponseEntity<List<CursoReporte>> getCursoReporte(@RequestParam("idCurso") String idCurso, @RequestParam("idGrado")  String idGrado){
 		List<CursoReporte> cursoReporteList = claseService.getCursoReporte(Long.parseLong(idCurso),Long.parseLong(idGrado));
@@ -160,6 +171,7 @@ public class MatriculaController {
 		return new ResponseEntity<>(cursoReporteList, HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
 	@PutMapping("/updateAsistencias")
 	public ResponseEntity<?> updateAsistencias(@RequestBody List<Asistencia> asistencias){
 		List<Asistencia> asistenciasActualizar = asistencias;
@@ -181,6 +193,7 @@ public class MatriculaController {
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/matriculasPorEstudiante")
 	public ResponseEntity<List<Matricula>> getMatriculasPorEstudiante(@Param("id") String id) {
 		return new ResponseEntity<List<Matricula>>(matriculaService.getMatriculasPorEstudiante(Long.parseLong(id)), HttpStatus.OK);
