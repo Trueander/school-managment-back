@@ -157,7 +157,7 @@ public class MatriculaController {
 		return new ResponseEntity<>(asistenciaService.obtenerDatosAsistenciaPorDia(fecha), HttpStatus.OK);
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
 	@GetMapping("/getAsistenciasFechaAula")
 	public ResponseEntity<?>  obtenerAsistenciasPorDia(@RequestParam("fecha") String fecha, @RequestParam("idAula") String idAula){
 		return new ResponseEntity<>(asistenciaService.findAsistenciaByFechaAula(fecha, Long.parseLong(idAula)), HttpStatus.OK);
