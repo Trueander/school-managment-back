@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import com.school.dao.MaterialDao;
 import com.school.dao.NotaDao;
+import com.school.model.Asignacion;
 import com.school.model.Aula;
 import com.school.model.Nota;
 import com.school.reportDto.AsistenciaReporte;
@@ -145,6 +146,11 @@ public class ClaseServiceImpl implements ClaseService{
 
 
 		return cursoReporteList;
+	}
+
+	@Override
+	public List<Asignacion> asignacionesPorClase(Long idClase) {
+		return claseDao.asignacionesPorClase(idClase);
 	}
 
 	private List<CursoReporte> buscarAprobadosYDesaprobados(List<Aula> aulas, Long idCurso){

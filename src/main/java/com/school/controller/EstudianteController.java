@@ -102,7 +102,7 @@ public class EstudianteController {
 
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ESTUDIANTE', 'PROFESOR')")
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getEstudiante(@PathVariable Long id){
 		
@@ -154,7 +154,7 @@ public class EstudianteController {
 
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ESTUDIANTE')")
 	@GetMapping("/porDni")
 	public ResponseEntity<?> getEstudiantePorDni(@RequestParam("dni") String dni){
 
@@ -209,7 +209,7 @@ public class EstudianteController {
 			estudianteActual.setNombres(estudiante.getNombres());
 			estudianteActual.setApellidoPaterno(estudiante.getApellidoPaterno());
 			estudianteActual.setApellidoMaterno(estudiante.getApellidoMaterno());
-			estudianteActual.setDni(estudiante.getDni());
+			estudianteActual.setCui(estudiante.getCui());
 			estudianteActual.setFechaNacimiento(estudiante.getFechaNacimiento());
 			estudianteActual.setCorreo(estudiante.getCorreo());
 			estudianteActual.setSexo(estudiante.getSexo());
@@ -264,7 +264,7 @@ public class EstudianteController {
 			estudianteActual.setNombres(estudiante.getNombres());
 			estudianteActual.setApellidoPaterno(estudiante.getApellidoPaterno());
 			estudianteActual.setApellidoMaterno(estudiante.getApellidoMaterno());
-			estudianteActual.setDni(estudiante.getDni());
+			estudianteActual.setCui(estudiante.getCui());
 			estudianteActual.setFechaNacimiento(estudiante.getFechaNacimiento());
 			estudianteActual.setCorreo(estudiante.getCorreo());
 			estudianteActual.setSexo(estudiante.getSexo());

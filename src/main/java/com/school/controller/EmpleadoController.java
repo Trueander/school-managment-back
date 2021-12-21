@@ -62,6 +62,9 @@ public class EmpleadoController {
         }
 
         try {
+            String[] nombres = empleado.getNombres().split(" ");
+            empleado.setCorreo(nombres[0] + "." + empleado.getApellidoPaterno());
+            empleado.setCorreo(empleado.getCorreo().concat("@elamericano.edu.pe").toLowerCase());
             empleadoNuevo = empleadoService.save(empleado);
         } catch (DataAccessException e) {
             response.put("mensaje", "Error al insertar el empleado en la base de datos");
@@ -156,7 +159,7 @@ public class EmpleadoController {
             empleadoActual.setNombres(empleado.getNombres());
             empleadoActual.setApellidoPaterno(empleado.getApellidoPaterno());
             empleadoActual.setApellidoMaterno(empleado.getApellidoMaterno());
-            empleadoActual.setDni(empleado.getDni());
+            empleadoActual.setCui(empleado.getCui());
             empleadoActual.setFechaNacimiento(empleado.getFechaNacimiento());
             empleadoActual.setCorreo(empleado.getCorreo());
             empleadoActual.setSexo(empleado.getSexo());

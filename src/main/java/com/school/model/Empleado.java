@@ -39,7 +39,7 @@ public class Empleado implements Serializable {
 
     @NotEmpty(message = "no puede estar vacío.")
     @Size(min = 8, max = 8, message = " tiene que tener 8 caracteres.")
-    private String dni;
+    private String cui;
 
     @NotEmpty(message = "no puede estar vacío.")
     @Size(min = 9, max = 9, message = " tiene que tener 8 caracteres.")
@@ -105,12 +105,12 @@ public class Empleado implements Serializable {
         this.fechaNacimiento = fechaNacimiento;
     }
 
-    public String getDni() {
-        return dni;
+    public String getCui() {
+        return cui;
     }
 
-    public void setDni(String dni) {
-        this.dni = dni;
+    public void setCui(String cui) {
+        this.cui = cui;
     }
 
     public String getCelular() {

@@ -35,7 +35,7 @@ public class Apoderado implements Serializable {
 	private String apellidoMaterno;
 	
 	@NotEmpty(message = "no puede estar vacío")
-	private String dni;
+	private String cui;
 	
 	@NotEmpty(message = "no puede estar vacío")
 	private String celular;
@@ -77,12 +77,12 @@ public class Apoderado implements Serializable {
 		this.apellidoMaterno = apellidoMaterno;
 	}
 
-	public String getDni() {
-		return dni;
+	public String getCui() {
+		return cui;
 	}
 
-	public void setDni(String dni) {
-		this.dni = dni;
+	public void setCui(String cui) {
+		this.cui = cui;
 	}
 
 	public String getCelular() {

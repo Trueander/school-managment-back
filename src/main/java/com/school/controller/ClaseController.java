@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import com.school.dao.MaterialDao;
+import com.school.model.Asignacion;
 import com.school.model.Material;
 import com.school.model.Nota;
 import com.school.service.FrecuenciaService;
@@ -61,7 +62,7 @@ public class ClaseController {
 		return new ResponseEntity<Nota>(nota, HttpStatus.CREATED);
 	}
 
-	@PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR', 'ESTUDIANTE')")
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getClase(@PathVariable Long id){
 		
@@ -202,10 +203,10 @@ public class ClaseController {
 
 	@PreAuthorize("hasAnyRole('ADMIN', 'PROFESOR')")
 	@PostMapping("/uploads")
-	public ResponseEntity<?> upload(@RequestParam("archivo") MultipartFile archivo, @RequestParam("idClase") String idAula, @RequestParam("nombreFile") String nombreFile){
+	public ResponseEntity<?> upload(@RequestParam("archivo") MultipartFile archivo, @RequestParam("idClase") String idClase, @RequestParam("nombreFile") String nombreFile){
 		Map<String, Object> response = new HashMap<>();
 
-		Clase clase = claseService.getClaseById(Long.parseLong(idAula)).orElse(null);
+		Clase clase = claseService.getClaseById(Long.parseLong(idClase)).orElse(null);
 
 		if(!archivo.isEmpty()){
 			String nombreArchivo = null;
@@ -293,6 +294,11 @@ public class ClaseController {
 
 		return ResponseEntity.ok().contentLength(data.length).header("Content.type", "application/octet-stream")
 				.header("Content-disposition", "attachment; filename=\"" + nombre + "\"").body(resource);
+	}
+
+	@GetMapping("/asignacionesPorClase/{idClase}")
+	public ResponseEntity<List<Asignacion>> listaAsignacionesPorClase(@PathVariable Long idClase) {
+		return new ResponseEntity<>(claseService.asignacionesPorClase(idClase), HttpStatus.OK);
 	}
 	
 }

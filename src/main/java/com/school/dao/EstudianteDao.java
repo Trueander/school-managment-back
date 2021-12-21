@@ -13,8 +13,8 @@ public interface EstudianteDao extends JpaRepository<Estudiante, Long>{
     @Query("FROM Estudiante e where e.usuario.username = ?1 and e.usuario.password = ?2 ")
     public Estudiante loginUsuario(String username, String password);
 
-    public Estudiante findByDniAndDni(String username, String password);
+    public Estudiante findByCuiAndCui(String username, String password);
 
-    public Estudiante findByDni(String dni);
+    public Estudiante findByCui(String dni);
 
 }

@@ -72,12 +72,12 @@ public class EstudianteServiceImpl implements EstudianteService{
 
 	@Override
 	public Estudiante findByDniAndDni(String username, String password) {
-		return estudianteDao.findByDniAndDni(username,password);
+		return estudianteDao.findByCuiAndCui(username,password);
 	}
 
 	@Override
 	public Estudiante findByDni(String dni) {
-		return estudianteDao.findByDni(dni);
+		return estudianteDao.findByCui(dni);
 	}
 
 

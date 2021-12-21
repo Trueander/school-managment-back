@@ -52,6 +52,6 @@ public class EmpleadoServiceImpl implements EmpleadoService{
 
     @Override
     public Empleado findByDni(String dni) {
-        return empleadoDao.findByDni(dni);
+        return empleadoDao.findByCui(dni);
     }
 }
