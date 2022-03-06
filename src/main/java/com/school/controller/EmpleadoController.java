@@ -1,6 +1,5 @@
 package com.school.controller;
 
-import com.school.dao.EmpleadoDao;
 import com.school.model.Clase;
 import com.school.model.Empleado;
 import com.school.model.Especialidad;
@@ -159,7 +158,7 @@ public class EmpleadoController {
             empleadoActual.setNombres(empleado.getNombres());
             empleadoActual.setApellidoPaterno(empleado.getApellidoPaterno());
             empleadoActual.setApellidoMaterno(empleado.getApellidoMaterno());
-            empleadoActual.setCui(empleado.getCui());
+            empleadoActual.setDni(empleado.getDni());
             empleadoActual.setFechaNacimiento(empleado.getFechaNacimiento());
             empleadoActual.setCorreo(empleado.getCorreo());
             empleadoActual.setSexo(empleado.getSexo());

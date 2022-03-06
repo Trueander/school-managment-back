@@ -39,8 +39,8 @@ public class Estudiante implements Serializable {
 	private String fechaNacimiento;
 
 	@NotEmpty(message = "no puede estar vacío.")
-	@Size(min = 13, max = 13, message = " tiene que tener 13 caracteres.")
-	private String cui;
+	@Size(min = 8, max = 8, message = " tiene que tener {min} caracteres.")
+	private String dni;
 
 	@NotEmpty(message = "no puede estar vacío")
 	@Size(min = 10, max = 80, message = " tiene que ser entre 10 y 80 caracteres.")
@@ -140,12 +140,12 @@ public class Estudiante implements Serializable {
 		this.fechaNacimiento = fechaNacimiento;
 	}
 
-	public String getCui() {
-		return cui;
+	public String getDni() {
+		return dni;
 	}
 
-	public void setCui(String cui) {
-		this.cui = cui;
+	public void setDni(String dni) {
+		this.dni = dni;
 	}
 
 	public String getSexo() {
