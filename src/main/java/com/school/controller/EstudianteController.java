@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import com.school.model.Nota;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -209,7 +208,7 @@ public class EstudianteController {
 			estudianteActual.setNombres(estudiante.getNombres());
 			estudianteActual.setApellidoPaterno(estudiante.getApellidoPaterno());
 			estudianteActual.setApellidoMaterno(estudiante.getApellidoMaterno());
-			estudianteActual.setCui(estudiante.getCui());
+			estudianteActual.setDni(estudiante.getDni());
 			estudianteActual.setFechaNacimiento(estudiante.getFechaNacimiento());
 			estudianteActual.setCorreo(estudiante.getCorreo());
 			estudianteActual.setSexo(estudiante.getSexo());
@@ -264,7 +263,7 @@ public class EstudianteController {
 			estudianteActual.setNombres(estudiante.getNombres());
 			estudianteActual.setApellidoPaterno(estudiante.getApellidoPaterno());
 			estudianteActual.setApellidoMaterno(estudiante.getApellidoMaterno());
-			estudianteActual.setCui(estudiante.getCui());
+			estudianteActual.setDni(estudiante.getDni());
 			estudianteActual.setFechaNacimiento(estudiante.getFechaNacimiento());
 			estudianteActual.setCorreo(estudiante.getCorreo());
 			estudianteActual.setSexo(estudiante.getSexo());
