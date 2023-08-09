@@ -36,7 +36,7 @@ public class AulaController {
 		return new ResponseEntity<List<Aula>>(aulaService.findAll(), HttpStatus.OK);
 	}
 
-	@PreAuthorize("hasAnyRole('ADMIN', 'ESTUDIANTE', 'PROFESOR')")
+//	@PreAuthorize("hasAnyRole('ADMIN', 'ESTUDIANTE', 'PROFESOR')")
 	@GetMapping("/estudiantes")
 	public ResponseEntity<List<Estudiante>> getAllEstudiantesAula(@RequestParam("id") String id){
 		return new ResponseEntity<List<Estudiante>>(aulaService.findEstudiantesAula(Long.parseLong(id)), HttpStatus.OK);

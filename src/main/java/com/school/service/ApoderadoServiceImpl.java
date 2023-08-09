@@ -50,7 +50,7 @@ public class ApoderadoServiceImpl implements ApoderadoService{
 
 	@Override
 	public Apoderado findByDni(String dni) {
-		return apoderadoService.findByCui(dni);
+		return apoderadoService.findByDni(dni);
 	}
 
 }

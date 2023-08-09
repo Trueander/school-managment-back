@@ -12,5 +12,5 @@ public interface EmpleadoDao extends JpaRepository<Empleado, Long> {
     @Query("FROM Clase c WHERE c.empleado.id = ?1")
     public List<Clase> findClasesProfesor(Long id);
 
-    public Empleado findByCui(String dni);
+    public Empleado findByDni(String dni);
 }
